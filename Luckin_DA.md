@@ -11,9 +11,9 @@
 --环境：GP
 --更新城市匹配表
 insert into luckin.dw_shop_city
-select distinct deptid::text,cityname from luckin.ods_shops_new where deptid::text not in (select shopid from luckin.dw_shop_city) and cityname!='' and cityname is not null;
+select distinct on(deptid::text)deptid::text,cityname from luckin.ods_shops_new where deptid::text not in (select shopid::text from luckin.dw_shop_city) and cityname!='' and cityname is not null;
 insert into luckin.dw_shop_city
-select distinct shopid::text,cityname from luckin.ods_shops_detail where shopid::text not in (select shopid from luckin.dw_shop_city) and cityname!='' and cityname is not null;
+select distinct on(shopid::text)shopid::text,cityname from luckin.ods_shops_detail where shopid::text not in (select shopid::text from luckin.dw_shop_city) and cityname!='' and cityname is not null;
 --检查是否还要有当月店铺没匹配到城市
 select distinct on (deptid) deptid::text, latitude, longitude
     from luckin.ods_shops_new
