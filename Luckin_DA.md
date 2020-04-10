@@ -127,3 +127,37 @@ where table_name='luckin_data_monthly' and field_name in
 
 
 
+### 2、 更新excel
+
+```sql
+with t1 as (
+select distinct deptid::text as shopid from luckin.ods_shops_new where ts_string='2020-03-01')
+select shopid,name,replace(replace(number,'(',''),')',''),j4.city,city_tier,gcjlat,gcjlon,decode((substring((shoplogo) from 'CtQL.*'))::text, 'CtQLO101jXyAffZ4AAAWeg_Jbn8375.png',
+                                       'flash', 'CtQLO101jZ2AZ6PQAAAWvqEqU4k138.png', 'pickup',
+                                       'CtQLO1031TSAeU_QAAAS-zDqTB0498.png', 'openingsoon',
+                                       'CtQLPF01jdKAXIRRAAAXNh2zxNc819.png', 'relax',
+                                       'CtQLO101jOiADegnAAAXE1MCtQk781.png', 'express','CtQyFV4fxHCAAturAAAPBmH50Fo271.png','mini', '') as types,
+      case when  number ilike '%No.MT%' then '实验店'
+when name like '%测试%' then '实验店'
+when name like '%厨房%' then '外卖厨房'
+when number ilike '%No.C%' then '小鹿茶代运营'
+when number ilike '%No.LX%' then '培训教室'
+when number ilike '%No.B%' then '小鹿茶自营'
+when number ilike '%No.ZLX%' then '鹿茶培训'
+when number ilike '%No.ZXL%' then '咖啡培训'
+when number ilike '%No.A%' then '瑞幸咖啡代运营'
+when number ilike '%no.T%' then '外卖厨房'
+when number ilike '%no.KS%' then '快闪店'
+when number ilike '%No.dyysyd%' then '代运营实验店'
+when number ilike '%No.SYD%' then '实验店'
+when number ilike '%No.RJGBJSYD%' then '实验店'
+when number ilike '%No.Perf%' then '压测店'
+when number ilike '%No.PX%' then '培训教室'
+when number ilike '%No.PJ%' then '品鉴活动'
+when number ilike '%No.RJGXMSYD%' then '实验店'
+when number ~ E'No\\.\\d' then '瑞幸咖啡自营'
+else '' end as typess,worktime,address from t1 left join (select distinct on(shopid) *
+from luckin.ods_shops_detail order by shopid,ts_string desc,length(address) desc) xx using(shopid)
+left join luckin.dw_shop_city j3 using(shopid)
+left join luckin.std_city j4 on j3.cityname=replace(j4.city,'市','');
+```
